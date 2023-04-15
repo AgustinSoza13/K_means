@@ -20,23 +20,6 @@ int *NumneroAleatorios(int N_DB){
     }
     return aleatorio;
 }
-//mostramos los valores de la matriz anidada
-void lecturaDeMatrizAnidada(int filas,int columnas, int **m){
-    for(int i = 0; i < filas; i++){//fila
-        for(int j = 0; j < columnas; j++){//columna
-            printf("%f ", m[i][j]);
-        }
-        printf("\n");
-    }
-    free(m);//liberamos memoria dinamica
-}
-//mostramos los valores de la matriz
-void lecturaDeMatriz(int *m){
-    int i;
-    for (i=0;i<K;i++){
-        printf("%i\n",m[i]);
-    }
-}
 //buscamos los centroides dentro de la base de datos
 float **BusquedaCentroide(int *aleatorio,float **ELEMS){
     int a,i;
@@ -48,8 +31,43 @@ float **BusquedaCentroide(int *aleatorio,float **ELEMS){
         centroides[i]=ELEMS[a];
 	}
     return centroides;
-}/*
-int *Kmeans(float **centroides,float **ELEMS,int N_DB, float *memoria){
+}
+
+float **promedio(int *Cluster,float **centroides,float **ELEMS,int N_DB,int a){
+    int x,j,k;
+    for (int x = 0; x < K; x++) {//fila cluster
+        int y=0;
+        for(j=0;j<N_DB;j++){
+            if(Cluster[j]==x){
+                for(k=0;k<DIM;k++){
+                    if(a==0){
+                        centroides[x][k]=((centroides[x][k]+ELEMS[j][k]));
+                    }
+                    else
+                    {
+                        if(y==0){
+                            centroides[x][k]=ELEMS[j][k];
+                        }
+                        else
+                            centroides[x][k]=((centroides[x][k]+ELEMS[j][k]));
+                    }
+                }
+                y++;   
+            }
+        }
+        /*
+        printf("******contador:%i\n",y);
+        printf("prueba%f\n",centroides[2][0]);
+        for(j=0;j<DIM;j++){
+            centroides[x][j]=(centroides[x][j])/y;
+            printf("%f\n",centroides[x][j]);  //primedio
+        }*/
+    }
+    return centroides;
+}
+
+//implementacion de k_means
+int *Kmeans(float **centroides,float **ELEMS,int N_DB, float **memoria){
     int i,j,k;
     int *Cluster;
     Cluster=(int *)malloc(sizeof(int)*N_DB);
@@ -59,7 +77,7 @@ int *Kmeans(float **centroides,float **ELEMS,int N_DB, float *memoria){
         float aux=0;
         for(j=0;j<K;j++){//cluster
             for(k=0;k<DIM;k++){
-                if(memoria[j]==&ELEMS[i]){
+                if(memoria[j]==ELEMS[i]){
                     pass;
                 }
                 else
@@ -83,7 +101,7 @@ int *Kmeans(float **centroides,float **ELEMS,int N_DB, float *memoria){
         Cluster[i]=cluster;   
     }
     return Cluster;
-}*/
+}
 
 
 
@@ -111,6 +129,24 @@ int *Euclidiana(int *aleatorio,float **ELEMS,int N_DB){
     return 0;
 }
 */
+/*
+void pt(float **ELEMS,int N_DB,float **memoria){
+    int j,i;
+    
+    for (i=0;i<N_DB;i++){
+        for(j=0;j<K;j++){
+            if(memoria[j]==ELEMS[i]){
+                printf("%i hola soy zeus\n",ELEMS[i]);
+            }
+            else
+                pass;    
+        }
+        
+        
+    }
+
+}*/
+
 int main()
 {
 	// Creamos los valores y punteros que contendran la base de datos
@@ -127,34 +163,41 @@ int main()
 	printf("%d\n", N_DB);//tamaño de base de datos
     //se llama la funcion NumneroAleatorios que retorna un puntero con valores alatorios 
     int *matriz_aleatoria=NumneroAleatorios(N_DB);
-    float  *memoria[K];
-    float **centroides;//creamos un puntero que tendra los centroides
-    int *kmeans;
-    
-    
+    //float  *memoria[K];
+    float **memoria = malloc(sizeof(float*) * K);
     for (i=0; i < K; i++)
 	{
-        a=matriz_aleatoria[i];
-        printf("%f",matriz_aleatoria[i]);
-        memoria[i]=(float*)&ELEMS[a];//copiamos la direccion de memoria
+        a=matriz_aleatoria[i]; 
+        memoria[i]=ELEMS[a];//copiamos la direccion de memoria
 	}
-    for (i=0;i<K;i++){
-        printf("%f\n",memoria[i]);
-    }
-
-    
-
+    float **centroides;//creamos un puntero que tendra los centroides
+    float **centroides_1;
+    int *kmeans;
     //llamo a la funcion busqueda centroide y me retorna los centroides aleatorios
     centroides=BusquedaCentroide(matriz_aleatoria,ELEMS);
+    kmeans=Kmeans(centroides,ELEMS,N_DB,memoria);
+    printf("------------------------");
+    printf("\n");
+    int z=0;
+    centroides_1=promedio(kmeans,centroides,ELEMS,N_DB,z);
+    for(i=0;i<K;i++){
+        for(j=0;j<DIM;j++){
+            printf("++%f++",centroides[i][j]);
+        }
+        printf("\n");
+    }
+    
+
+    /*for(i=0;i<K;i++){
+        printf("%f",centroides_1[i]);
+    }*/
+    
+    
+
     
     return 0;
     //kmeans=Kmeans(centroides,ELEMS,N_DB,memoria);
     
     //euclidiana=Euclidiana(matriz_aleatoria,ELEMS,N_DB);
     //calclar distancia, y son los elemntos y x van a ser los 3 cluster creo que debe ir un if
-	
-    //resultado 1 sqrt(y-x[0])^2 x cetroide
-    //resultado 3 sqrt(y-x[2])^2
-    //resultado 2 sqrt(y-x[1])^2
-
 }
