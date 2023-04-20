@@ -1,4 +1,4 @@
-//Italo__Pereda-Cristobal_rodenas
+//Italo_Pereda_Soza-Cristobal_Rodenas_Rodenas
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -195,19 +195,18 @@ float **promedio(int *Cluster,float **centroides,float **ELEMS,int N_DB){
     #pragma omp parallel for private(i, j, x) shared(Cluster,centroides,ELEMS,N_DB,promedios)
     for(i=0;i<K;i++){//cantidad de cluster
         int y=0;//sera para contar cuantas veces se cumple que k esta en el arreglo cluster
-        int iteracion=0;
         for(j=0;j<N_DB;j++){//base de datos
             if(Cluster[j]==i){//si en el arreglo Cluster esta el K(cluster) entramos al for sino continua iterando 
                 for(x=0;x<DIM;x++){//dimenciones
                     #pragma omp atomic//nos aseguramos que la operacion se realice , por un hilo a la vez, los demas hilos tienen que esperar
                     promedios[i][x]+=ELEMS[j][x];//sumamos los vectores 
                 }
+
                 y++;                           
-            } 
-            iteracion++;   
+            }  
         }
         if(y==1){
-            for(j=0;j<DIM;j++){//en caso de que solo se encuentre uno o no tenga ninguno conjunto asociado en la primera iteracion el cluster se divide por uno
+            for(j=0;j<DIM;j++){//en caso de que solo se encuentre uno o no tenga ninguno conjunto asociado en la primera iteracion el cluster se divide por uno 
                 centroides[i][j]=(promedios[i][j])/1;
             } 
         }
@@ -266,9 +265,28 @@ int *Kmeanuno(int *kmeans,float **centroides,float **ELEMS,int N_DB){
     return Cluster;
     
 }
+//obtener datos del procesador
+void Cpu(char* cpuinfo)
+{
+    FILE* file = fopen("/proc/cpuinfo", "r");
+    if (file == NULL) {
+        printf("Error al abrir el archivo /proc/cpuinfo\n");
+        return;
+    }
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+        if (sscanf(line, "model name : %[^\n]", cpuinfo) == 1) {
+            break;
+        }
+    }
+    fclose(file);
+}
 
+//escribo
 void EscribirTxt(int *Cluster,int N_DB, int num_cores, int num_threads, float paralelo,float cpu_time_used){
+    char cpuinfo[256];
     FILE *archivo;
+    Cpu(cpuinfo);
     archivo = fopen("resultados.txt", "w");//abrimos el archivo para escribir
 
     if (archivo == NULL)
@@ -285,6 +303,10 @@ void EscribirTxt(int *Cluster,int N_DB, int num_cores, int num_threads, float pa
     fprintf(archivo, "Cantidad de vectores: %d\n", N_DB);
     fprintf(archivo, "Cantidad de núcleos del sistema: %ld\n", num_cores);
     fprintf(archivo, "Cantidad de hilos del sistema: %ld\n", num_threads);
+    fprintf(archivo, "Nombre del procesador y frecuencia: %s\n", cpuinfo);
+    fprintf(archivo, "Tamaño de caché L1 de datos: %ld bytes\n", sysconf(_SC_LEVEL1_DCACHE_SIZE));
+    fprintf(archivo, "Tamaño de caché L2 de datos: %ld bytes\n", sysconf(_SC_LEVEL2_CACHE_SIZE));
+    fprintf(archivo, "Tamaño de caché L3 de datos: %ld bytes\n", sysconf(_SC_LEVEL3_CACHE_SIZE));
     fprintf(archivo, "Speed-Up (Tiempo secuencial / Tiempo paralelo): %f\n",(cpu_time_used/paralelo));
     fclose(archivo);
 }
@@ -360,13 +382,16 @@ int main()
             printf("iteración: %i\n",iterador);
         }
     }
-    //for(i=0;i<N_DB;i++){printf("%i",resultado[i]);}
+    for(i=0;i<N_DB;i++){
+        printf("\n%i\n",resultado[i]);
+    }
     
     double end_time = omp_get_wtime();//  tiempo de fin
     double tiempo_paralelo = end_time - start_time;//tiempo de ejecucion
 
 
     // Código secuencial
+    printf("-----------------Secuencial-----------------");
     float **centroides2,**centroides1;
     int *kmeans2,*kmeans1,*resultado1;
     clock_t start, end;   // para medir el tiempo de ejecución
