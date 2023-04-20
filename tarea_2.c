@@ -9,10 +9,8 @@
 #define DIM 20
 #define T 8
 #define K 3
-
 //crear una funcion que devuelva el puntero del arreglo con los centroides
 //generamos numeros aleatorios de 0 a n_db(cantidad de filas del archivo txt), luego retornamos en un arreglo los valores//bueno
-
 int *Kmeans(float **centroides,float **ELEMS,int N_DB){
     int i,j,x;
     int *Cluster;
@@ -54,32 +52,44 @@ int *Kmeans(float **centroides,float **ELEMS,int N_DB){
 
 //bueno
 float **promedio(int *Cluster,float **centroides,float **ELEMS,int N_DB){
+
     int i,j,x;
+    float **promedios;
+    promedios = (float **)malloc(sizeof(float *) * K);
+    for (i = 0; i < K; i++){
+        promedios[i] = (float *)malloc(sizeof(float) * DIM);
+    }
+    for (i = 0; i < K; i++) {
+        for (j = 0; j < DIM; j++)
+            promedios[i][j] = 0;
+    }
+
+
     for(i=0;i<K;i++){
         int y=0;
         int iteracion=0;
         for(j=0;j<N_DB;j++){    //base de datos
             if(Cluster[j]==i){
                 for(x=0;x<DIM;x++){
-                    //centroides[i][x]=((centroides[i][x]+ELEMS[j][x]));//suma con centroide
-                    centroides[i][x]+=ELEMS[j][x];
-
+                        //centroides[i][x]=((centroides[i][x]+ELEMS[j][x]));//suma con centroide
+                    promedios[i][x]+=ELEMS[j][x];
                 }
-                
-                
                 y++;                           
             } 
             iteracion++;   
         }
        //printf("\n%i\n",y);
-        if(y==0){
+        if (y==0){
+            printf("aqui estoy bombon");
+        }
+        if(y==1){
             for(j=0;j<DIM;j++){
-                centroides[i][j]=(centroides[i][j])/1;
+                centroides[i][j]=(promedios[i][j])/1;
             } 
         }
         else{
             for(j=0;j<DIM;j++){
-                centroides[i][j]=(centroides[i][j])/y;
+                centroides[i][j]=(promedios[i][j])/y;
             }   
         }
 
@@ -89,6 +99,7 @@ float **promedio(int *Cluster,float **centroides,float **ELEMS,int N_DB){
             printf("++%f++",centroides[i][j]);
         }*/
     }
+    free(promedios);
     return centroides;
 }
 //implementacion de k_means //bueno
@@ -107,6 +118,8 @@ int *Kmeanuno(int *kmeans,float **centroides,float **ELEMS,int N_DB){
                 aux=(pow(centroides[j][x]-ELEMS[i][x],2))+aux;
             }
             aux=sqrt(aux);
+            //printf("\n");
+            //("%f",aux);
             if(aux==0){
                 resultado=aux;
                 cluster=j;
@@ -123,7 +136,7 @@ int *Kmeanuno(int *kmeans,float **centroides,float **ELEMS,int N_DB){
                 else
                     pass;    
         }
-
+       // printf("\n--------------------------%i",cluster);
         Cluster[i]=cluster;        
     }
     return Cluster;
@@ -182,7 +195,9 @@ int main()
         for (j = 0; j < DIM; j++)
             centroides[i][j] = ELEMS[i][j];
     } 
+    
     kmeans=Kmeans(centroides,ELEMS,N_DB);
+  
     centroides=promedio(kmeans,centroides,ELEMS,N_DB);
     int *resultado = (int *)malloc(sizeof(int) * N_DB);
     int iterador=1;
@@ -210,6 +225,9 @@ int main()
             centroides=promedio(kmeans,centroides,ELEMS,N_DB);
         }
         printf("%i iteracion:",iterador);
+    }
+    for(i=0;i<N_DB;i++){
+        printf("%i",resultado[i]);
     }
     end = clock();
     cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
