@@ -95000,8 +95000,8 @@ El vector 94998 pertenece al clúster: 2
 El vector 94999 pertenece al clúster: 2
 
 ---- Datos generales ----
-Tiempo de ejecución paralelo: 13.473766
-Tiempo de ejecución secuencial: 54.274437 segundos
+Tiempo de ejecución paralelo: 13.132497
+Tiempo de ejecución secuencial: 55.619202 segundos
 Cantidad de vectores: 95000
 Cantidad de núcleos del sistema: 24
 Cantidad de hilos del sistema: 8
@@ -95009,4 +95009,4 @@ Nombre del procesador y frecuencia: Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz
 Tamaño de caché L1 de datos: 32768 bytes
 Tamaño de caché L2 de datos: 262144 bytes
 Tamaño de caché L3 de datos: 15728640 bytes
-Speed-Up (Tiempo secuencial / Tiempo paralelo): 4.028156
+Speed-Up (Tiempo secuencial / Tiempo paralelo): 4.235234

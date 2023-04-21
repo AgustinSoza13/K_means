@@ -74,6 +74,11 @@ float **promedioSecuencial(int *Cluster,float **centroides,float **ELEMS,int N_D
             } 
             iteracion++;   
         }
+        if(y==0){//en caso de que no tenga ningun vector asociado a el, se mantiene el mismo centroide
+            for(j=0;j<DIM;j++){
+                centroides[i][j]=centroides[i][j];
+            }
+        }
         if(y==1){//en caso de que solo se encuentre uno o no tenga ninguno conjunto asociado en la primera iteracion el cluster se divide por uno
             for(j=0;j<DIM;j++){
                 centroides[i][j]=(promedios[i][j])/1;
@@ -204,6 +209,11 @@ float **promedio(int *Cluster,float **centroides,float **ELEMS,int N_DB){
 
                 y++;                           
             }  
+        }
+        if(y==0){//en caso de que no tenga ningun vector asociado a el, se mantiene el mismo centroide
+            for(j=0;j<DIM;j++){
+                centroides[i][j]=centroides[i][j];
+            }
         }
         if(y==1){
             for(j=0;j<DIM;j++){//en caso de que solo se encuentre uno o no tenga ninguno conjunto asociado en la primera iteracion el cluster se divide por uno 
